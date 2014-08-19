@@ -1,0 +1,29 @@
+{
+  "name": "swagger-to-raml-object",
+  "version": "0.0.0",
+  "description": "Takes a swagger spec and converts it into a RAML JavaScript object, usually for conversion to RAML.",
+  "main": "swagger-to-raml-object.js",
+  "scripts": {
+    "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mulesoft/swagger-to-raml-object.git"
+  },
+  "keywords": [
+    "raml",
+    "swagger",
+    "conversion"
+  ],
+  "author": "MuleSoft, Inc.",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/mulesoft/swagger-to-raml-object/issues"
+  },
+  "homepage": "https://github.com/mulesoft/swagger-to-raml-object",
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "istanbul": "^0.3.0",
+    "mocha": "^1.21.4"
+  }
+}
