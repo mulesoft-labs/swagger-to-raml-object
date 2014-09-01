@@ -14,8 +14,15 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   }
 
   if (resourceListing.info) { convertInfo(resourceListing.info); }
+  if (resourceListing.swaggerVersion) {
+    ramlObj.documentation.push({
+      title: "swaggerVersion",
+      content: resourceListing.swaggerVersion
+    });
+  }
+  if (resourceListing.apiVersion) { ramlObj.version = resourceListing.apiVersion };
   return ramlObj;
-}
+};
 
 module.exports = {};
 module.exports.resourceListing = parseResourceListing;
