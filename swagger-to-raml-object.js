@@ -23,10 +23,10 @@ var parseResourceListing = function(resourceListing, ramlObj) {
 
   var addAuthorizationObject = function(auth) {
     if (!ramlObj.securitySchemes) { ramlObj.securitySchemes = []; }
-    if (auth.oauth2) {
-      if (auth.oauth2.passAs === "header") {
+    if (auth.type === "oauth2") {
+      if (auth.passAs === "header") {
 
-      } else if (auth.oauth2.passAs === "query") {
+      } else if (auth.passAs === "query") {
 
       }
       var obj = {
@@ -41,17 +41,16 @@ var parseResourceListing = function(resourceListing, ramlObj) {
         accessTokenUri: {},
         authorizationGrants: ["code", "token"]
       };
-      var passAs = obj.describedBy[auth.oauth2.passAs];
+      var passAs = obj.oauth2.describedBy[auth.passAs];
       var keyname = "default";
       if (passAs === "header") keyname = "headers";
       if (passAs === "query") keyname = "queryParameters"
-      obj.describedBy[passAs] = {type: "string"};
+      obj.oauth2.describedBy[keyname] = {type: "string"};
       ramlObj.securitySchemes.push(obj);
     }
   };
 
   var addAuthorizationObjects = function(authorizations) {
-    authType = "oauth2";
     _(authorizations).each(function(x) { addAuthorizationObject(x); });
   };
 
