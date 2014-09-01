@@ -41,9 +41,11 @@ var parseResourceListing = function(resourceListing, ramlObj) {
         accessTokenUri: {},
         authorizationGrants: ["code", "token"]
       };
-      // obj.describedBy[auth.oauth2.passAs] = { // passAs should be "header" or "query"
-      //   type: "string"
-      // };
+      var passAs = obj.describedBy[auth.oauth2.passAs];
+      var keyname = "default";
+      if (passAs === "header") keyname = "headers";
+      if (passAs === "query") keyname = "queryParameters"
+      obj.describedBy[passAs] = {type: "string"};
       ramlObj.securitySchemes.push(obj);
     }
   };
