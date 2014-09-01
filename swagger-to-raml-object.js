@@ -2,9 +2,10 @@ var _ = require('lodash');
 
 var parseResourceListing = function(resourceListing, ramlObj) {
   resourceListing = resourceListing || {};
-  ramlObj = ramlObj || {documentation: [], resources: []};
+  ramlObj = ramlObj || {};
 
   var convertInfo = function(info) {
+    if (!ramlObj.documentation) ramlObj.documentation = [];
     ramlObj.title = info.title;
     // RAML has no analogous top-level description, so use "documentation"
     _(["description", "termsOfServiceUrl", "contact", "license", "licenseUrl"])
@@ -14,6 +15,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   };
 
   var addResourceObjects = function(apis) {
+    if (!ramlObj.resources) ramlObj.resources = [];
     _(apis).each(function(api) {
       ramlObj.resources.push({relativeUri: api.path, description: api.description})
     });
