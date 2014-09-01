@@ -2,7 +2,7 @@ var _ = require('lodash');
 
 var parseResourceListing = function(resourceListing, ramlObj) {
   resourceListing = resourceListing || {};
-  ramlObj = ramlObj || {documentation: []};
+  ramlObj = ramlObj || {documentation: [], resources: []};
 
   var convertInfo = function(info) {
     ramlObj.title = info.title;
@@ -11,8 +11,15 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     .each(function(item) {
       if (info[item]) ramlObj.documentation.push({title: item, content: info[item]});
     });
-  }
+  };
 
+  var addResourceObjects = function(apis) {
+    _(apis).each(function(api) {
+      ramlObj.resources.push({relativeUri: api.path, description: api.description})
+    });
+  };
+
+  addResourceObjects(resourceListing.apis);
   if (resourceListing.info) { convertInfo(resourceListing.info); }
   if (resourceListing.swaggerVersion) {
     ramlObj.documentation.push({
