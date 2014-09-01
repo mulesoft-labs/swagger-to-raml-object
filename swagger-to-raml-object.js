@@ -5,7 +5,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   ramlObj = ramlObj || {};
 
   var convertInfo = function(info) {
-    if (!ramlObj.documentation) ramlObj.documentation = [];
+    if (!ramlObj.documentation) { ramlObj.documentation = []; }
     ramlObj.title = info.title;
     // RAML has no analogous top-level description, so use "documentation"
     _(["description", "termsOfServiceUrl", "contact", "license", "licenseUrl"])
@@ -15,13 +15,46 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   };
 
   var addResourceObjects = function(apis) {
-    if (!ramlObj.resources) ramlObj.resources = [];
+    if (!ramlObj.resources) { ramlObj.resources = []; }
     _(apis).each(function(api) {
       ramlObj.resources.push({relativeUri: api.path, description: api.description})
     });
   };
 
+  var addAuthorizationObject = function(auth) {
+    if (!ramlObj.securitySchemes) { ramlObj.securitySchemes = []; }
+    if (auth.oauth2) {
+      if (auth.oauth2.passAs === "header") {
+
+      } else if (auth.oauth2.passAs === "query") {
+
+      }
+      var obj = {
+        oauth2: {
+          type: "OAuth 2.0",
+          describedBy: {},
+          settings: {}
+        }
+      };
+      obj.settings = {
+        authorizationUri: {},
+        accessTokenUri: {},
+        authorizationGrants: ["code", "token"]
+      };
+      // obj.describedBy[auth.oauth2.passAs] = { // passAs should be "header" or "query"
+      //   type: "string"
+      // };
+      ramlObj.securitySchemes.push(obj);
+    }
+  };
+
+  var addAuthorizationObjects = function(authorizations) {
+    authType = "oauth2";
+    _(authorizations).each(function(x) { addAuthorizationObject(x); });
+  };
+
   addResourceObjects(resourceListing.apis);
+  addAuthorizationObjects(resourceListing.authorizations);
   if (resourceListing.info) { convertInfo(resourceListing.info); }
   if (resourceListing.swaggerVersion) {
     ramlObj.documentation.push({
