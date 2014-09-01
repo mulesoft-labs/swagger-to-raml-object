@@ -21,9 +21,22 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     });
   };
 
-    var addAuthorizationObject = function(auth) {
+  addImplicitGrantType = function(swaggerImplicit, ramlSettings) {
+    // Mutates ramlSettings passed in.  Destructive!
+    var input = swaggerImplicit;
+    if (input && input.loginEndpoint && input.loginEndpoint.url) {
+      ramlSettings.authorizationUri = input.loginEndpoint.url;
+    }
+    if (input.tokenName) {
+      ramlSettings.documentation = ramlSettings.documentation || [];
+      ramlSettings.documentation.push({implicit_grant_token_name: input.tokenName});
+    }
+  }
+
+  var addAuthorizationObject = function(auth) {
     if (!ramlObj.securitySchemes) { ramlObj.securitySchemes = []; }
     if (auth.type === "oauth2") {
+      if (!auth.grantTypes) return;  // without grant types, the Oauth2 declaration is not needed
       var obj = {
         oauth2: {
           type: "OAuth 2.0",
@@ -36,6 +49,9 @@ var parseResourceListing = function(resourceListing, ramlObj) {
         accessTokenUri: {},
         authorizationGrants: ["code", "token"] // can be "code", "token", "owner" or "credentials"
       };
+      if (auth.grantTypes.implicit) {
+        addImplicitGrantType(auth.grantTypes.implicit, obj.oauth2.settings)
+      }
       if (auth.scopes) { obj.oauth2.settings.scopes = _(auth.scopes).cloneDeep(); }
       var passAs = obj.oauth2.describedBy[auth.passAs];
       var keyname = false;
@@ -50,6 +66,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     _(authorizations).each(function(x) { addAuthorizationObject(x); });
   };
 
+  // Begin building RAML object
   addResourceObjects(resourceListing.apis);
   addAuthorizationObjects(resourceListing.authorizations);
   if (resourceListing.info) { convertInfo(resourceListing.info); }
