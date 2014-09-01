@@ -7,14 +7,10 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   var convertInfo = function(info) {
     ramlObj.title = info.title;
     // RAML has no analogous top-level description, so use "documentation"
-    if (info.description) ramlObj.documentation.push({
-      title: "description",
-      content: info.description
+    _(["description", "termsOfServiceUrl", "contact", "license", "licenseUrl"])
+    .each(function(item) {
+      if (info[item]) ramlObj.documentation.push({title: item, content: info[item]});
     });
-    if (info.termsOfServiceUrl) ramlObj.documentation.push({title: "termsOfServiceUrl", content: info.termsOfServiceUrl});
-    if (info.contact) ramlObj.documentation.push({title: "contact", content: info.contact});
-    if (info.license) ramlObj.documentation.push({title: "license", content: info.license});
-    if (info.licenseUrl) ramlObj.documentation.push({title: "licenseUrl", content: info.licenseUrl});
   }
 
   if (resourceListing.info) { convertInfo(resourceListing.info); }
