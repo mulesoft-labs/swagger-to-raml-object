@@ -31,7 +31,13 @@ var parseResourceListing = function(resourceListing, ramlObj) {
       ramlSettings.documentation = ramlSettings.documentation || [];
       ramlSettings.documentation.push({implicit_grant_token_name: input.tokenName});
     }
-  }
+  };
+
+  addAuthorizationCode = function(swaggerAuthCode, ramlSettings) {
+    // Mutates ramlSettings passed in.  Destructive!
+    var input = swaggerAuthCode;
+
+  };
 
   var addAuthorizationObject = function(auth) {
     if (!ramlObj.securitySchemes) { ramlObj.securitySchemes = []; }
@@ -50,7 +56,9 @@ var parseResourceListing = function(resourceListing, ramlObj) {
         authorizationGrants: ["code", "token"] // can be "code", "token", "owner" or "credentials"
       };
       if (auth.grantTypes.implicit) {
-        addImplicitGrantType(auth.grantTypes.implicit, obj.oauth2.settings)
+        addImplicitGrantType(auth.grantTypes.implicit, obj.oauth2.settings);
+      } else if (auth.grantTypes.authorization_code) {
+        addAuthorizationCode(auth.grantTypes.authorization_code, obj.oauth2.settings);
       }
       if (auth.scopes) { obj.oauth2.settings.scopes = _(auth.scopes).cloneDeep(); }
       var passAs = obj.oauth2.describedBy[auth.passAs];
