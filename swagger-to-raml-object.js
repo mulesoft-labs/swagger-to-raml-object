@@ -19,7 +19,9 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   };
 
   var addResourceObjects = function(apis) {
-    if (!ramlObj.resources) { ramlObj.resources = []; }
+    if (!ramlObj.resources) {
+      ramlObj.resources = [];
+    }
     _(apis).each(function(api) {
       ramlObj.resources.push({relativeUri: api.path, description: api.description})
     });
@@ -44,9 +46,13 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   };
 
   var addAuthorizationObject = function(auth) {
-    if (!ramlObj.securitySchemes) { ramlObj.securitySchemes = []; }
+    if (!ramlObj.securitySchemes) {
+      ramlObj.securitySchemes = [];
+    }
     if (auth.type === "oauth2") {
-      if (!auth.grantTypes) return;  // without grant types, the Oauth2 declaration is not needed
+      if (!auth.grantTypes) {
+        return;  // without grant types, the Oauth2 declaration is not needed
+      }
       var obj = {
         oauth2: {
           type: "OAuth 2.0",
@@ -64,12 +70,20 @@ var parseResourceListing = function(resourceListing, ramlObj) {
       } else if (auth.grantTypes.authorization_code) {
         addAuthorizationCode(auth.grantTypes.authorization_code, obj.oauth2.settings);
       }
-      if (auth.scopes) { obj.oauth2.settings.scopes = _(auth.scopes).cloneDeep(); }
+      if (auth.scopes) {
+        obj.oauth2.settings.scopes = _(auth.scopes).cloneDeep();
+      }
       var passAs = obj.oauth2.describedBy[auth.passAs];
       var keyname = false;
-      if (passAs === "header") keyname = "headers";
-      if (passAs === "query") keyname = "queryParameters"
-      if (keyname) obj.oauth2.describedBy[keyname] = {type: "string"};
+      if (passAs === "header") {
+        keyname = "headers";
+      }
+      if (passAs === "query") {
+        keyname = "queryParameters";
+      }
+      if (keyname) {
+        obj.oauth2.describedBy[keyname] = {type: "string"};
+      }
       ramlObj.securitySchemes.push(obj);
     }
   };
@@ -81,14 +95,18 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   // Begin building RAML object
   addResourceObjects(resourceListing.apis);
   addAuthorizationObjects(resourceListing.authorizations);
-  if (resourceListing.info) { convertInfo(resourceListing.info); }
+  if (resourceListing.info) {
+    convertInfo(resourceListing.info);
+  }
   if (resourceListing.swaggerVersion) {
     ramlObj.documentation.push({
       title: "swaggerVersion",
       content: resourceListing.swaggerVersion
     });
   }
-  if (resourceListing.apiVersion) { ramlObj.version = resourceListing.apiVersion };
+  if (resourceListing.apiVersion) {
+    ramlObj.version = resourceListing.apiVersion
+  };
   return ramlObj;
 };
 
