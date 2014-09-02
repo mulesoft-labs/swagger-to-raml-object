@@ -41,8 +41,24 @@ var parseResourceListing = function(resourceListing, ramlObj) {
 
   var addAuthorizationCode = function(swaggerAuthCode, ramlSettings) {
     // Mutates ramlSettings passed in.  Destructive!
-    var input = swaggerAuthCode;
-
+    var tokenRequestEndpoint = swaggerAuthCode.tokenRequestEndpoint;
+    var tokenEndpoint = swaggerAuthCode.tokenEndpoint;
+    ramlSettings.authorizationUri = tokenRequestEndpoint.url;
+    ramlSettings.accessTokenUri = tokenEndpoint.url;
+    // Place optional Swagger fields into settings documentation
+    if (tokenRequestEndpoint.clientIdName) {
+      ramlSettings.documentation = ramlSettings.documentation || [];
+      ramlSettings.documentation.push(
+        {authcode_client_id_name: tokenRequestEndpoint.clientIdName});
+    }
+    if (tokenRequestEndpoint.clientSecretName) {
+      ramlSettings.documentation = ramlSettings.documentation || [];
+      ramlSettings.documentation.push({authcode_client_secret_name: tokenRequestEndpoint.clientSecretName});
+    }
+    if (tokenEndpoint.tokenName) {
+      ramlSettings.documentation = ramlSettings.documentation || [];
+      ramlSettings.documentation.push({authcode_token_name: tokenEndpoint.tokenName});
+    }
   };
 
   var addAuthorizationObject = function(auth) {
@@ -67,7 +83,8 @@ var parseResourceListing = function(resourceListing, ramlObj) {
       };
       if (auth.grantTypes.implicit) {
         addImplicitGrantType(auth.grantTypes.implicit, obj.oauth2.settings);
-      } else if (auth.grantTypes.authorization_code) {
+      }
+      if (auth.grantTypes.authorization_code) {
         addAuthorizationCode(auth.grantTypes.authorization_code, obj.oauth2.settings);
       }
       if (auth.scopes) {
