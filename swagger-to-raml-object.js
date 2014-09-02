@@ -1,3 +1,5 @@
+"use strict";
+
 var _ = require('lodash');
 
 var parseResourceListing = function(resourceListing, ramlObj) {
@@ -23,7 +25,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     });
   };
 
-  addImplicitGrantType = function(swaggerImplicit, ramlSettings) {
+  var addImplicitGrantType = function(swaggerImplicit, ramlSettings) {
     // Mutates ramlSettings passed in.  Destructive!
     var input = swaggerImplicit;
     if (input && input.loginEndpoint && input.loginEndpoint.url) {
@@ -35,7 +37,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     }
   };
 
-  addAuthorizationCode = function(swaggerAuthCode, ramlSettings) {
+  var addAuthorizationCode = function(swaggerAuthCode, ramlSettings) {
     // Mutates ramlSettings passed in.  Destructive!
     var input = swaggerAuthCode;
 
