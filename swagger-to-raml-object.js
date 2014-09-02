@@ -99,6 +99,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     convertInfo(resourceListing.info);
   }
   if (resourceListing.swaggerVersion) {
+    ramlObj.documentation = ramlObj.documentation || [];
     ramlObj.documentation.push({
       title: 'swaggerVersion',
       content: resourceListing.swaggerVersion
