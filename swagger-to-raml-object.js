@@ -5,13 +5,15 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   ramlObj = ramlObj || {};
 
   var convertInfo = function(info) {
-    if (!ramlObj.documentation) { ramlObj.documentation = []; }
+    if (!ramlObj.documentation) {
+      ramlObj.documentation = [];
+    }
     ramlObj.title = info.title;
     // RAML has no analogous top-level description, so use "documentation"
-    _(["description", "termsOfServiceUrl", "contact", "license", "licenseUrl"])
-    .each(function(item) {
-      if (info[item]) ramlObj.documentation.push({title: item, content: info[item]});
-    });
+    ramlObj.documentation = _(info)
+      .pick(["description", "termsOfServiceUrl", "contact", "license", "licenseUrl"])
+      .map(function (value, name) { return {title: name, content:value}; })
+      .value()
   };
 
   var addResourceObjects = function(apis) {
@@ -88,5 +90,4 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   return ramlObj;
 };
 
-module.exports = {};
-module.exports.resourceListing = parseResourceListing;
+exports.resourceListing = parseResourceListing;
