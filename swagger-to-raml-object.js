@@ -13,7 +13,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     ramlObj.title = info.title;
     // RAML has no analogous top-level description, so use "documentation"
     ramlObj.documentation = _(info)
-      .pick(["description", "termsOfServiceUrl", "contact", "license", "licenseUrl"])
+      .pick(['description', 'termsOfServiceUrl', 'contact', 'license', 'licenseUrl'])
       .map(function (value, name) { return {title: name, content:value}; })
       .value()
   };
@@ -49,13 +49,13 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     if (!ramlObj.securitySchemes) {
       ramlObj.securitySchemes = [];
     }
-    if (auth.type === "oauth2") {
+    if (auth.type === 'oauth2') {
       if (!auth.grantTypes) {
         return;  // without grant types, the Oauth2 declaration is not needed
       }
       var obj = {
         oauth2: {
-          type: "OAuth 2.0",
+          type: 'OAuth 2.0',
           describedBy: {},
           settings: {}
         }
@@ -63,7 +63,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
       obj.oauth2.settings = {
         authorizationUri: {},
         accessTokenUri: {},
-        authorizationGrants: ["code", "token"] // can be "code", "token", "owner" or "credentials"
+        authorizationGrants: ['code', 'token'] // can be 'code', 'token', 'owner' or 'credentials'
       };
       if (auth.grantTypes.implicit) {
         addImplicitGrantType(auth.grantTypes.implicit, obj.oauth2.settings);
@@ -75,14 +75,14 @@ var parseResourceListing = function(resourceListing, ramlObj) {
       }
       var passAs = obj.oauth2.describedBy[auth.passAs];
       var keyname = false;
-      if (passAs === "header") {
-        keyname = "headers";
+      if (passAs === 'header') {
+        keyname = 'headers';
       }
-      if (passAs === "query") {
-        keyname = "queryParameters";
+      if (passAs === 'query') {
+        keyname = 'queryParameters';
       }
       if (keyname) {
-        obj.oauth2.describedBy[keyname] = {type: "string"};
+        obj.oauth2.describedBy[keyname] = {type: 'string'};
       }
       ramlObj.securitySchemes.push(obj);
     }
@@ -100,7 +100,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   }
   if (resourceListing.swaggerVersion) {
     ramlObj.documentation.push({
-      title: "swaggerVersion",
+      title: 'swaggerVersion',
       content: resourceListing.swaggerVersion
     });
   }
