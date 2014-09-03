@@ -95,6 +95,19 @@ describe('resourse listing converter', function () {
         expect(settings.documentation[2].authcode_token_name).to.equal('access_code');
       });
     });
+
+    describe('add basic authentication', function() {
+      it('should add the login url', function () {
+        var output = convert({
+          "authorizations": {
+            "basic": {
+              "type": "basicAuth"
+            }
+          }
+        });
+        expect(output.securitySchemes[0].basic.type).to.equal('Basic Authentication');
+      });
+    });
   });
 
   describe('swagger version', function () {
