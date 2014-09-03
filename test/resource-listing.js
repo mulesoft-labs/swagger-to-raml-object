@@ -48,16 +48,41 @@ describe('resourse listing converter', function () {
             }
           }
         });
-        expect(output.securitySchemes[0].oauth2.settings.authorizationUri)
-          .to.equal('http://example.com/oauth/dialog');
-        expect(output.securitySchemes[0].oauth2.settings.documentation[0])
-          .to.deep.equal({implicit_grant_token_name: 'access_token'});
+        settings = output.securitySchemes[0].oauth2.settings;
+
+        expect(settings.authorizationUri).to.equal('http://example.com/oauth/dialog');
+        expect(settings.documentation[0]).to.deep.equal(
+          {implicit_grant_token_name: 'access_token'});
       });
     });
 
     describe('add authorization code', function () {
-      it('should add the token request endpoint URL', function() {
+      beforeEach(function () {
+        output = convert({
+          "authorizations": {
+            "oauth2": {
+              "type": "oauth2",
+              "grantTypes": {
+                "authorization_code": {
+                  "tokenRequestEndpoint": {
+                    "url": "http://example.com/oauth/requestToken",
+                    "clientIdName": "client_id",
+                    "clientSecretName": "client_secret"
+                  },
+                  "tokenEndpoint": {
+                    "url": "http://example.com/oauth/token",
+                    "tokenName": "access_code"
+                  }
+                }
+              }
+            }
+          }
+        });
+        settings = output.securitySchemes[0].oauth2.settings;
+      });
 
+      it('should add the token request endpoint URL', function() {
+        expect(settings.authorizationUri).to.equal('http://example.com/oauth/requestToken');
       });
 
       it('should add the token endpoint URL', function() {
