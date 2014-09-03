@@ -65,6 +65,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   };
 
   var addAuthorizationObject = function(auth) {
+    var obj = {}; // obj to be built and pushed to security schemes
     if (!ramlObj.securitySchemes) {
       ramlObj.securitySchemes = [];
     }
@@ -72,12 +73,10 @@ var parseResourceListing = function(resourceListing, ramlObj) {
       if (!auth.grantTypes) {
         return;  // without grant types, the Oauth2 declaration is not needed
       }
-      var obj = {
-        oauth2: {
-          type: 'OAuth 2.0',
-          describedBy: {},
-          settings: {}
-        }
+      obj.oauth2 = {
+        type: 'OAuth 2.0',
+        describedBy: {},
+        settings: {}
       };
       obj.oauth2.settings = {
         authorizationUri: {},
@@ -93,19 +92,32 @@ var parseResourceListing = function(resourceListing, ramlObj) {
       if (auth.scopes) {
         obj.oauth2.settings.scopes = _(auth.scopes).pluck('scope').value();
       }
-      var passAs = obj.oauth2.describedBy[auth.passAs];
-      var keyname = false;
-      if (passAs === 'header') {
+    } else if (auth.type === 'basicAuth') {
+      obj.basic = {
+        type: "Basic Authentication",
+        describedBy: {},
+        settings: {}
+      };
+    } else if (auth.type === 'apiKey') {
+      var keyname = 'default';
+
+      obj.apiKey = {
+        type: "x-ApiKey",
+        describedBy: {}
+      }
+      if (auth.passAs === 'header') {
         keyname = 'headers';
       }
-      if (passAs === 'query') {
+      if (auth.passAs === 'query') {
         keyname = 'queryParameters';
       }
-      if (keyname) {
-        obj.oauth2.describedBy[keyname] = {type: 'string'};
+      if (auth.passAs) {
+        obj.apiKey.describedBy[keyname] = {type: 'string'};
       }
-      ramlObj.securitySchemes.push(obj);
+
     }
+
+    ramlObj.securitySchemes.push(obj);
   };
 
   var addAuthorizationObjects = function(authorizations) {
