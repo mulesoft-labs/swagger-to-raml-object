@@ -15,7 +15,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     ramlObj.documentation = _(info)
       .pick(['description', 'termsOfServiceUrl', 'contact', 'license', 'licenseUrl'])
       .map(function (value, name) { return {title: name, content:value}; })
-      .value()
+      .value();
   };
 
   var addResourceObjects = function(apis) {
@@ -23,7 +23,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
       ramlObj.resources = [];
     }
     _(apis).each(function(api) {
-      ramlObj.resources.push({relativeUri: api.path, description: api.description})
+      ramlObj.resources.push({relativeUri: api.path, description: api.description});
     });
   };
 
@@ -37,6 +37,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
       ramlSettings.documentation = ramlSettings.documentation || [];
       ramlSettings.documentation.push({implicit_grant_token_name: input.tokenName});
     }
+    ramlSettings.authorizationGrants = _.union(ramlSettings.authorizationGrants, ['token']);
   };
 
   var addAuthorizationCode = function(swaggerAuthCode, ramlSettings) {
@@ -53,12 +54,14 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     }
     if (tokenRequestEndpoint.clientSecretName) {
       ramlSettings.documentation = ramlSettings.documentation || [];
-      ramlSettings.documentation.push({authcode_client_secret_name: tokenRequestEndpoint.clientSecretName});
+      ramlSettings.documentation.push(
+        {authcode_client_secret_name: tokenRequestEndpoint.clientSecretName});
     }
     if (tokenEndpoint.tokenName) {
       ramlSettings.documentation = ramlSettings.documentation || [];
       ramlSettings.documentation.push({authcode_token_name: tokenEndpoint.tokenName});
     }
+    ramlSettings.authorizationGrants = _.union(ramlSettings.authorizationGrants, ['code'])
   };
 
   var addAuthorizationObject = function(auth) {
@@ -79,7 +82,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
       obj.oauth2.settings = {
         authorizationUri: {},
         accessTokenUri: {},
-        authorizationGrants: ['code', 'token'] // can be 'code', 'token', 'owner' or 'credentials'
+        authorizationGrants: [] // can be 'code', 'token', 'owner' or 'credentials'
       };
       if (auth.grantTypes.implicit) {
         addImplicitGrantType(auth.grantTypes.implicit, obj.oauth2.settings);
