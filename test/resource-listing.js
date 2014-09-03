@@ -90,7 +90,9 @@ describe('resourse listing converter', function () {
       });
 
       it('should place optional Swagger fields into documentation', function() {
-
+        expect(settings.documentation[0].authcode_client_id_name).to.equal('client_id');
+        expect(settings.documentation[1].authcode_client_secret_name).to.equal('client_secret');
+        expect(settings.documentation[2].authcode_token_name).to.equal('access_code');
       });
     });
   });
