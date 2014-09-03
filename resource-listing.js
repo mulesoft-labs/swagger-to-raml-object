@@ -90,11 +90,11 @@ var parseResourceListing = function(resourceListing, ramlObj) {
         addAuthorizationCode(auth.grantTypes.authorization_code, obj.oauth2.settings);
       }
       if (auth.scopes) {
-        obj.oauth2.settings.scopes = _(auth.scopes).pluck('scope').value();
+        obj.oauth2.settings.scopes = _.(auth.scopes, 'scope');
       }
     } else if (auth.type === 'basicAuth') {
       obj.basic = {
-        type: "Basic Authentication",
+        type: 'Basic Authentication',
         describedBy: {},
         settings: {}
       };
@@ -119,7 +119,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
   };
 
   var addAuthorizationObjects = function(authorizations) {
-    _(authorizations).each(function(x) { addAuthorizationObject(x); });
+    _(authorizations).each(addAuthorizationObject);
   };
 
   // Begin building RAML object
