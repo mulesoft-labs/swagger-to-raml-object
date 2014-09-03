@@ -86,7 +86,7 @@ describe('resourse listing converter', function () {
       });
 
       it('should add the token endpoint URL', function() {
-
+        expect(settings.accessTokenUri).to.equal('http://example.com/oauth/token');
       });
 
       it('should place optional Swagger fields into documentation', function() {
