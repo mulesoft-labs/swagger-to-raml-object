@@ -30,6 +30,46 @@ describe('resourse listing converter', function () {
     });
   });
 
+  describe('security', function() {
+    describe('add implicit grant type', function () {
+      it('should add the login url', function () {
+        var output = convert({
+          "authorizations": {
+            "oauth2": {
+              "type": "oauth2",
+              "grantTypes": {
+                "implicit": {
+                  "loginEndpoint": {
+                    "url": "http://example.com/oauth/dialog"
+                  },
+                  "tokenName": "access_token"
+                }
+              }
+            }
+          }
+        });
+        expect(output.securitySchemes[0].oauth2.settings.authorizationUri)
+          .to.equal('http://example.com/oauth/dialog');
+        expect(output.securitySchemes[0].oauth2.settings.documentation[0])
+          .to.deep.equal({implicit_grant_token_name: 'access_token'});
+      });
+    });
+
+    describe('add authorization code', function () {
+      it('should add the token request endpoint URL', function() {
+
+      });
+
+      it('should add the token endpoint URL', function() {
+
+      });
+
+      it('should place optional Swagger fields into documentation', function() {
+
+      });
+    });
+  });
+
   describe('swagger version', function () {
     it('should convert the swagger version', function () {
       var output = convert({
