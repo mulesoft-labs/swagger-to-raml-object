@@ -53,23 +53,23 @@ describe('resourse listing converter', function () {
     it('should convert all parts of the swagger info object', function () {
       var output = convert({
         info: {
-          "title":"Example App",
-          "description":"This is a sample server.",
-          "termsOfServiceUrl":"http://example.com/terms/",
-          "contact":"apiteam@example.com",
-          "license":"Apache 2.0",
-          "licenseUrl":"http://www.apache.org/licenses/LICENSE-2.0.html"
+          'title':'Example App',
+          'description':'This is a sample server.',
+          'termsOfServiceUrl':'http://example.com/terms/',
+          'contact':'apiteam@example.com',
+          'license':'Apache 2.0',
+          'licenseUrl':'http://www.apache.org/licenses/LICENSE-2.0.html'
         }
       });
       expect(output.documentation).to.deep.equal([
         { title: 'description', content: 'This is a sample server.' },
-        { title: 'termsOfServiceUrl',
-         content: 'http://example.com/terms/' },
+        { title: 'termsOfServiceUrl', content: 'http://example.com/terms/' },
         { title: 'contact', content: 'apiteam@example.com' },
         { title: 'license', content: 'Apache 2.0' },
         { title: 'licenseUrl',
          content: 'http://www.apache.org/licenses/LICENSE-2.0.html' }
-       ]);
+      ]);
+      expect(output.title).to.equal('Example App');
     });
   });
 });

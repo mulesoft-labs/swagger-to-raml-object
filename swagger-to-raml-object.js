@@ -88,7 +88,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
         addAuthorizationCode(auth.grantTypes.authorization_code, obj.oauth2.settings);
       }
       if (auth.scopes) {
-        obj.oauth2.settings.scopes = _(auth.scopes).cloneDeep();
+        obj.oauth2.settings.scopes = _(auth.scopes).pluck('scope').value();
       }
       var passAs = obj.oauth2.describedBy[auth.passAs];
       var keyname = false;
