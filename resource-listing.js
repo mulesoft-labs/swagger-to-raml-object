@@ -90,7 +90,7 @@ var parseResourceListing = function(resourceListing, ramlObj) {
         addAuthorizationCode(auth.grantTypes.authorization_code, obj.oauth2.settings);
       }
       if (auth.scopes) {
-        obj.oauth2.settings.scopes = _.(auth.scopes, 'scope');
+        obj.oauth2.settings.scopes = _.pluck(auth.scopes, 'scope');
       }
     } else if (auth.type === 'basicAuth') {
       obj.basic = {
@@ -99,20 +99,17 @@ var parseResourceListing = function(resourceListing, ramlObj) {
         settings: {}
       };
     } else if (auth.type === 'apiKey') {
-      var keyname = 'default';
+      var authKeynameMap = {
+        header: 'headers',
+        query: 'queryParameters'
+      };
 
       obj.apiKey = {
         type: "x-ApiKey",
         describedBy: {}
       }
-      if (auth.passAs === 'header') {
-        keyname = 'headers';
-      }
-      if (auth.passAs === 'query') {
-        keyname = 'queryParameters';
-      }
-      if (auth.passAs) {
-        obj.apiKey.describedBy[keyname] = {apiKey: {type: 'string'}};
+      if (auth.passAs && authKeynameMap[auth.passAs]) {
+        obj.apiKey.describedBy[authKeynameMap[auth.passAs]] = {apiKey: {type: 'string'}};
       }
     }
     ramlObj.securitySchemes.push(obj);
