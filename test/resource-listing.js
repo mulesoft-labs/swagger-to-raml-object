@@ -3,8 +3,6 @@
 var expect  = require('chai').expect;
 var converter = require('../');
 
-console.log(converter);
-
 describe('resourse listing converter', function () {
   var builder;
 
