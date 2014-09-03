@@ -100,9 +100,7 @@ describe('resourse listing converter', function () {
       it('should add the login url', function () {
         var output = convert({
           "authorizations": {
-            "basic": {
-              "type": "basicAuth"
-            }
+            "basic": { "type": "basicAuth"}
           }
         });
         expect(output.securitySchemes[0].basic.type).to.equal('Basic Authentication');
@@ -128,6 +126,18 @@ describe('resourse listing converter', function () {
         expect(output.securitySchemes[0].apiKey.describedBy).to.have.keys(['queryParameters']);
       });
     });
+
+    describe('multiple', function() {
+      it('should be able to handle multiple authentication objects', function() {
+        var output = convert({
+          "authorizations": {
+            "basic": { "type": "basicAuth"},
+            "key": { "type": "apiKey", "passAs": "query"}
+          }
+        });
+        expect(output.securitySchemes.length).to.equal(2);
+      });
+    })
   });
 
   describe('swagger version', function () {
