@@ -108,6 +108,26 @@ describe('resourse listing converter', function () {
         expect(output.securitySchemes[0].basic.type).to.equal('Basic Authentication');
       });
     });
+
+    describe('add apikey authentication', function() {
+      it('should set the type to x-ApiKey', function () {
+        var output = convert({
+          "authorizations": {
+            "key": { "type": "apiKey", "passAs": "header"}
+          }
+        });
+        expect(output.securitySchemes[0].apiKey.type).to.equal('x-ApiKey');
+      });
+
+      it('should use the value of passAs as the keyname inside describedBy', function() {
+        var output = convert({
+          "authorizations": {
+            "key": { "type": "apiKey", "passAs": "query"}
+          }
+        });
+        expect(output.securitySchemes[0].apiKey.describedBy).to.have.keys(['queryParameters']);
+      });
+    });
   });
 
   describe('swagger version', function () {
