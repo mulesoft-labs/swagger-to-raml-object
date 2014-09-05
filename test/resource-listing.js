@@ -170,11 +170,11 @@ describe('resourse listing converter', function () {
         }
       });
       expect(output.documentation).to.deep.equal([
-        { title: 'description', content: 'This is a sample server.' },
-        { title: 'termsOfServiceUrl', content: 'http://example.com/terms/' },
-        { title: 'contact', content: 'apiteam@example.com' },
-        { title: 'license', content: 'Apache 2.0' },
-        { title: 'licenseUrl',
+        { title: 'Description', content: 'This is a sample server.' },
+        { title: 'Terms of Service URL', content: 'http://example.com/terms/' },
+        { title: 'Contact', content: 'apiteam@example.com' },
+        { title: 'License', content: 'Apache 2.0' },
+        { title: 'License URL',
          content: 'http://www.apache.org/licenses/LICENSE-2.0.html' }
       ]);
       expect(output.title).to.equal('Example App');

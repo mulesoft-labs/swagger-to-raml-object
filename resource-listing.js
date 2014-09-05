@@ -10,11 +10,18 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     if (!ramlObj.documentation) {
       ramlObj.documentation = [];
     }
+    var titlesNamesMap = {
+      'description': 'Description',
+      'termsOfServiceUrl': 'Terms of Service URL',
+      'contact': 'Contact',
+      'license': 'License',
+      'licenseUrl': 'License URL'
+    };
     ramlObj.title = info.title;
     // RAML has no analogous top-level description, so use "documentation"
     ramlObj.documentation = _(info)
       .pick(['description', 'termsOfServiceUrl', 'contact', 'license', 'licenseUrl'])
-      .map(function (value, name) { return {title: name, content:value}; })
+      .map(function (value, name) { return {title: titlesNamesMap[name], content:value}; })
       .value();
   };
 
