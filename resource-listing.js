@@ -56,17 +56,24 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     // Place optional Swagger fields into settings documentation
     if (tokenRequestEndpoint.clientIdName) {
       ramlSettings.documentation = ramlSettings.documentation || [];
-      ramlSettings.documentation.push(
-        {authcode_client_id_name: tokenRequestEndpoint.clientIdName});
+      ramlSettings.documentation.push({
+        authcode_client_id_name: 'The API uses "' + tokenRequestEndpoint.clientIdName +
+        '" as the paremeter for passing the client id'
+      });
     }
     if (tokenRequestEndpoint.clientSecretName) {
       ramlSettings.documentation = ramlSettings.documentation || [];
-      ramlSettings.documentation.push(
-        {authcode_client_secret_name: tokenRequestEndpoint.clientSecretName});
+      ramlSettings.documentation.push({
+        authcode_client_secret_name: 'The API uses "' + tokenRequestEndpoint.clientSecretName +
+        '" as the parameter for passing the client secret'
+      });
     }
     if (tokenEndpoint.tokenName) {
       ramlSettings.documentation = ramlSettings.documentation || [];
-      ramlSettings.documentation.push({authcode_token_name: tokenEndpoint.tokenName});
+      ramlSettings.documentation.push({
+        authcode_token_name: 'The API uses "' + tokenEndpoint.tokenName +
+        '"as the parameter for passing the authorization token name'
+      });
     }
     ramlSettings.authorizationGrants = _.union(ramlSettings.authorizationGrants, ['code'])
   };
