@@ -34,9 +34,12 @@ var parseResourceListing = function(resourceListing, ramlObj) {
     });
   };
 
-  var addImplicitGrantType = function(swaggerImplicit, ramlSettings) {
-    // Mutates ramlSettings passed in.  Destructive!
-    var input = swaggerImplicit;
+  /**
+  * Adds implicit grant type information to RAML object
+  * Mutates ramlSettings passed in. Destructive!
+  * @param {object} input - the implicitGrantTypes object inside the Swagger object
+  */
+  var addImplicitGrantType = function(input, ramlSettings) {
     if (input && input.loginEndpoint && input.loginEndpoint.url) {
       ramlSettings.authorizationUri = input.loginEndpoint.url;
     }
