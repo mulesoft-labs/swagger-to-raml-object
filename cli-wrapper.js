@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 var cliArgs = process.argv.slice(2);
-if (cliArgs.length < 2) {
-  console.error("Usage: swagger-to-raml <resourceListingFile> <1st apiDeclarationFile> <2nd apiDeclarationFile>...");
-  console.error("One resource listing file and at least one api declaration file is required.");
+
+if (!cliArgs.length) {
+  console.error('Usage: swagger-to-raml <resourceListingFile> <1st apiDeclarationFile> <2nd apiDeclarationFile>...');
+  console.error('One resource listing file and at least one api declaration file is required.');
   process.exit(1);
 }
 
@@ -15,5 +16,6 @@ fs.readFile(cliArgs[0], function (err, data){
     process.exit(1);
   };
   var listingObj = JSON.parse(data.toString());
-  console.log(converter.resourceListing(listingObj, {}));
+
+  console.log(JSON.stringify(converter.resourceListing(listingObj, {})));
 });
