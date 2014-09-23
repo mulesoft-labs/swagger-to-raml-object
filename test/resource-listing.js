@@ -1,183 +1,192 @@
 /* global describe, it, beforeEach */
+var expect    = require('chai').expect;
+var converter = require('../lib/resource-listing');
 
-var expect  = require('chai').expect;
-var converter = require('../');
-
-describe('resourse listing converter', function () {
-  var builder;
-
-  beforeEach(function () {
-    convert = converter.resourceListing;
-  });
-
+describe('resourse listing', function () {
   describe('resources', function () {
-    it('should convert the resources', function () {
-      var output = convert({
+    it('should convert root resources', function () {
+      var output = converter({
         apis: [{
-          description: "Users of the app",
-          path: "/user"
+          path:        '/user',
+          description: 'Users of the app'
         }]
       });
 
       expect(output).to.deep.equal({
         resources: [{
-          description: "Users of the app",
-          relativeUri: "/user"
+          relativeUri: '/user',
+          description: 'Users of the app'
         }]
       });
     });
   });
 
-  describe('security', function() {
-    describe('add implicit grant type', function () {
-      it('should add the login url', function () {
-        var output = convert({
-          "authorizations": {
-            "oauth2": {
-              "type": "oauth2",
-              "grantTypes": {
-                "implicit": {
-                  "loginEndpoint": {
-                    "url": "http://example.com/oauth/dialog"
+  describe('security schemes', function () {
+    describe('implicit', function () {
+      it('should convert implicit authentication', function () {
+        var output = converter({
+          authorizations: {
+            oauth2: {
+              type: 'oauth2',
+              grantTypes: {
+                implicit: {
+                  loginEndpoint: {
+                    url: 'http://example.com/oauth/dialog'
                   },
-                  "tokenName": "access_token"
+                  tokenName: 'access_token'
                 }
               }
             }
           }
         });
-        settings = output.securitySchemes[0].oauth2.settings;
 
-        expect(settings.authorizationUri).to.equal('http://example.com/oauth/dialog');
-        expect(settings.documentation[0]).to.deep.equal(
-          {implicit_grant_token_name: 'access_token'});
+        expect(output).to.deep.equal({
+          securitySchemes: [{
+            oauth2: {
+              type: 'OAuth 2.0',
+              settings: {
+                authorizationUri: 'http://example.com/oauth/dialog',
+                authorizationGrants: ['token']
+              }
+            }
+          }]
+        });
       });
     });
 
-    describe('add authorization code', function () {
-      beforeEach(function () {
-        output = convert({
-          "authorizations": {
-            "oauth2": {
-              "type": "oauth2",
-              "grantTypes": {
-                "authorization_code": {
-                  "tokenRequestEndpoint": {
-                    "url": "http://example.com/oauth/requestToken",
-                    "clientIdName": "client_id",
-                    "clientSecretName": "client_secret"
+    describe('authorization code', function () {
+      it('should convert authorization code authentication', function () {
+        var output = converter({
+          authorizations: {
+            oauth2: {
+              type: 'oauth2',
+              grantTypes: {
+                authorization_code: {
+                  tokenRequestEndpoint: {
+                    url: 'http://example.com/oauth/requestToken',
+                    clientIdName: 'client_id',
+                    clientSecretName: 'client_secret'
                   },
-                  "tokenEndpoint": {
-                    "url": "http://example.com/oauth/token",
-                    "tokenName": "access_code"
+                  tokenEndpoint: {
+                    url: 'http://example.com/oauth/token',
+                    tokenName: 'access_code'
                   }
                 }
               }
             }
           }
         });
-        settings = output.securitySchemes[0].oauth2.settings;
-      });
 
-      it('should add the token request endpoint URL', function() {
-        expect(settings.authorizationUri).to.equal('http://example.com/oauth/requestToken');
-      });
-
-      it('should add the token endpoint URL', function() {
-        expect(settings.accessTokenUri).to.equal('http://example.com/oauth/token');
-      });
-
-      it('should place optional Swagger fields into documentation', function() {
-        expect(settings.documentation[0].authcode_client_id_name).to.match(/client_id/);
-        expect(settings.documentation[1].authcode_client_secret_name).to.match(/client_secret/);
-        expect(settings.documentation[2].authcode_token_name).to.match(/access_code/);
+        expect(output).to.deep.equal({
+          securitySchemes: [{
+            oauth2: {
+              type: 'OAuth 2.0',
+              settings: {
+                accessTokenUri: 'http://example.com/oauth/token',
+                authorizationUri: 'http://example.com/oauth/requestToken',
+                authorizationGrants: ['code']
+              }
+            }
+          }]
+        });
       });
     });
 
-    describe('add basic authentication', function() {
-      it('should add the login url', function () {
-        var output = convert({
-          "authorizations": {
-            "basic": { "type": "basicAuth"}
+    describe('basic auth', function () {
+      it('should convert basic authentication', function () {
+        var output = converter({
+          authorizations: {
+            basic: {
+              type: 'basicAuth'
+            }
           }
         });
-        expect(output.securitySchemes[0].basic.type).to.equal('Basic Authentication');
+
+        expect(output).to.deep.equal({
+          securitySchemes: [{
+            basic: {
+              type: 'Basic Authentication'
+            }
+          }]
+        });
       });
     });
 
-    describe('add apikey authentication', function() {
-      it('should set the type to x-ApiKey', function () {
-        var output = convert({
-          "authorizations": {
-            "key": { "type": "apiKey", "passAs": "header"}
+    describe('api key', function () {
+      it('should convert the api key type with documentation', function () {
+        var output = converter({
+          authorizations: {
+            apiKey: {
+              type: 'apiKey',
+              passAs: 'header',
+              keyname: 'api_key'
+            }
           }
         });
-        expect(output.securitySchemes[0].apiKey.type).to.equal('x-ApiKey');
-      });
 
-      it('should use the value of passAs as the keyname inside describedBy', function() {
-        var output = convert({
-          "authorizations": {
-            "key": { "type": "apiKey", "passAs": "query"}
-          }
-        });
-        expect(output.securitySchemes[0].apiKey.describedBy).to.have.keys(['queryParameters']);
-      });
-    });
+        var apiKeyAuth = output.securitySchemes[0].apiKey;
 
-    describe('multiple', function() {
-      it('should be able to handle multiple authentication objects', function() {
-        var output = convert({
-          "authorizations": {
-            "basic": { "type": "basicAuth"},
-            "key": { "type": "apiKey", "passAs": "query"}
-          }
-        });
-        expect(output.securitySchemes.length).to.equal(2);
+        expect(output.securitySchemes).to.have.length(1);
+        expect(apiKeyAuth).to.be.an('object');
+        expect(apiKeyAuth.type).to.equal('x-api-key');
+        expect(apiKeyAuth.describedBy).to.have.keys(['headers']);
+        expect(apiKeyAuth.describedBy.headers.api_key).to.have.keys(
+          ['description', 'type']
+        );
       });
-    })
-  });
-
-  describe('swagger version', function () {
-    it('should convert the swagger version', function () {
-      var output = convert({
-        swaggerVersion: '1.2'
-      });
-      expect(output.documentation[0].title).to.equal('swaggerVersion');
-      expect(output.documentation[0].content).to.equal('1.2');
     });
   });
 
   describe('api version', function () {
-    it('should convert the api version', function () {
-      var output = convert({
+    it('should set the api version', function () {
+      var output = converter({
         apiVersion: '1.1'
       });
-      expect(output.version).to.equal('1.1');
+
+      expect(output).to.deep.equal({
+        version: '1.1'
+      });
     });
   });
 
-  describe('swagger info', function () {
-    it('should convert all parts of the swagger info object', function () {
-      var output = convert({
+  describe('swagger information', function () {
+    it('should convert base swagger information', function () {
+      var output = converter({
         info: {
-          'title':'Example App',
-          'description':'This is a sample server.',
-          'termsOfServiceUrl':'http://example.com/terms/',
-          'contact':'apiteam@example.com',
-          'license':'Apache 2.0',
-          'licenseUrl':'http://www.apache.org/licenses/LICENSE-2.0.html'
+          title: 'Example API',
+          description: 'This is an example.',
+          termsOfServiceUrl: 'http://example.com/terms/',
+          contact: 'apiteam@example.com',
+          license: 'Apache 2.0',
+          licenseUrl: 'http://www.apache.org/licenses/LICENSE-2.0.html'
         }
       });
-      expect(output.documentation).to.deep.equal([
-        { title: 'Description', content: 'This is a sample server.' },
-        { title: 'Terms of Service URL', content: 'http://example.com/terms/' },
-        { title: 'Contact', content: 'apiteam@example.com' },
-        { title: 'License', content: 'Apache 2.0' },
-        { title: 'License URL',
-         content: 'http://www.apache.org/licenses/LICENSE-2.0.html' }
-      ]);
-      expect(output.title).to.equal('Example App');
+
+      expect(output).to.deep.equal({
+        title: 'Example API',
+        documentation: [
+          {
+            title: 'Description',
+            content: 'This is an example.'
+          },
+          {
+            title: 'Terms of Service URL',
+            content: 'http://example.com/terms/'
+          },
+          {
+            title: 'Contact',
+            content: 'apiteam@example.com'
+          },
+          {
+            title: 'License',
+            content: 'Apache 2.0'
+          },
+          {
+            title: 'License URL',
+            content: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+          }
+        ]
+      });
     });
   });
 });
