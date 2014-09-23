@@ -9,18 +9,22 @@ Takes a swagger spec and converts it into a RAML JavaScript object, usually for 
 ## Installation
 
 ```
-git clone https://github.com/mulesoft/swagger-to-raml-object.git
-cd swagger-to-raml-object
-npm install
-npm install -g . # package not yet hosted on NPM
+npm install swagger-to-raml-object --save
 ```
 
 ## Usage
 
+### CLI
+
+The CLI accepts a single swagger file to load and will recursively compile the spec into a single RAML object representation before printing the JSON to stdout.
+
 ```javascript
-swagger-to-raml-object resourceListing.json apiDeclaration1.json apiDeclaration2.json...
+swagger-to-raml-object resources.json > raml.json
 ```
-Note: API Declaration file conversion isn't implemented in this branch, but two command line arguments are still required.
+
+### JavaScript
+
+
 
 ## License
 

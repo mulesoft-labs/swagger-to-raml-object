@@ -1,5 +1,3 @@
-"use strict";
+module.exports = function (filename, filereader, done) {
 
-var parseResourceListing = require('./resource-listing').convert;
-
-exports.resourceListing = parseResourceListing;
+};

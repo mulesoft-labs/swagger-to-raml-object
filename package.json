@@ -7,7 +7,7 @@
     "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec"
   },
   "bin": {
-    "swagger-to-raml-object": "./cli-wrapper.js"
+    "swagger-to-raml-object": "./bin/swagger-to-raml-object.js"
   },
   "repository": {
     "type": "git",
@@ -28,8 +28,5 @@
     "chai": "^1.9.1",
     "istanbul": "^0.3.0",
     "mocha": "^1.21.4"
-  },
-  "dependencies": {
-    "lodash": "^2.4.1"
   }
 }
