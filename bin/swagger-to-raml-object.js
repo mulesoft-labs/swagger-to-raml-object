@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var fs        = require('fs');
-var http      = require('http');
+var request   = require('request');
 var converter = require('../');
 var args      = process.argv.slice(2);
 
