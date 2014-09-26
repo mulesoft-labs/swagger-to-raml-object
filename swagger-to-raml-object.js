@@ -16,21 +16,23 @@ module.exports = swaggerToRamlObject;
  * @param {Function} done
  */
 function swaggerToRamlObject (filename, filereader, done) {
-  return filereader(filename, wrapContents(function (content) {
-    if (!isResourceListing(content)) {
-      return done(null, convertApiDeclaration(content));
+  var read = wrapFileReader(filereader);
+
+  return read(filename, wrapContents(function (result) {
+    if (!isResourceListing(result)) {
+      return done(null, convertApiDeclaration(result));
     }
 
     // Parse the initial resource listing to start reading more resources.
-    var ramlObject = convertResourceListing(content);
-    var resources  = content.apis.map(function (api) {
+    var ramlObject = convertResourceListing(result);
+    var resources  = result.apis.map(function (api) {
       return filename + api.path;
     });
 
-    return async(resources, filereader, wrapContents(function (contents) {
+    return async(resources, read, wrapContents(function (results) {
       // Iterate over the resulting contents and convert into a single object.
-      contents.forEach(function (content) {
-        convertApiDeclaration(content, ramlObject);
+      results.forEach(function (result) {
+        convertApiDeclaration(result, ramlObject);
       });
 
       return done(null, ramlObject);
@@ -73,6 +75,28 @@ function async (items, fn, done) {
 }
 
 /**
+ * Wrap the file reader functionality with parsing.
+ *
+ * @param  {Function} fn
+ * @return {Function}
+ */
+function wrapFileReader (fn) {
+  return function (filename, done) {
+    return fn(filename, function (err, result) {
+      if (err) {
+        return done(err);
+      }
+
+      try {
+        return done(null, parse(result));
+      } catch (e) {
+        return done(e);
+      }
+    });
+  }
+}
+
+/**
  * Wrap the response from a file reader with parse ability.
  *
  * @param  {Function} resolve
@@ -80,17 +104,13 @@ function async (items, fn, done) {
  * @return {Function}
  */
 function wrapContents (resolve, reject) {
-  return function (err, contents) {
+  return function (err, result) {
     if (err) {
       return reject(err);
     }
 
     try {
-      if (Array.isArray(contents)) {
-        return resolve(contents.map(parse));
-      }
-
-      return resolve(parse(contents));
+      return resolve(result);
     } catch (e) {
       return reject(e);
     }
