@@ -181,8 +181,6 @@ describe('api declaration', function () {
         }
       });
 
-      console.log(JSON.stringify(output, null, 2));
-
       expect(output).to.deep.equal({
         version: '1.0.0',
         baseUri: 'http://example.com',
@@ -199,7 +197,7 @@ describe('api declaration', function () {
                     description: 'This can only be done by the logged in user.',
                     body: {
                       'application/json': {
-                        schema: '{\n  "$schema": "http://json-schema.org/draft-04/schema#",\n  "properties": {\n    "id": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "integer"\n    },\n    "firstName": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "username": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "lastName": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "email": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "password": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "phone": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "userStatus": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "integer",\n      "description": "User Status",\n      "enum": [\n        "1-registered",\n        "2-active",\n        "3-closed"\n      ]\n    }\n  },\n  "description": "Updated user object",\n  "required": true\n}'
+                        schema: '{\n  "$schema": "http://json-schema.org/draft-04/schema#",\n  "properties": {\n    "id": {\n      "type": "integer"\n    },\n    "firstName": {\n      "type": "string"\n    },\n    "username": {\n      "type": "string"\n    },\n    "lastName": {\n      "type": "string"\n    },\n    "email": {\n      "type": "string"\n    },\n    "password": {\n      "type": "string"\n    },\n    "phone": {\n      "type": "string"\n    },\n    "userStatus": {\n      "type": "integer",\n      "description": "User Status",\n      "enum": [\n        "1-registered",\n        "2-active",\n        "3-closed"\n      ]\n    }\n  },\n  "description": "Updated user object",\n  "required": true\n}'
                       }
                     },
                     responses: {
@@ -273,7 +271,7 @@ describe('api declaration', function () {
                     description: 'This can only be done by the logged in user.',
                     body: {
                       'application/json': {
-                        schema: '{\n  "$schema": "http://json-schema.org/draft-04/schema#",\n  "properties": {\n    "id": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "integer"\n    },\n    "firstName": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "username": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "lastName": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "email": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "password": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "phone": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "string"\n    },\n    "userStatus": {\n      "$schema": "http://json-schema.org/draft-04/schema#",\n      "type": "integer",\n      "description": "User Status",\n      "enum": [\n        "1-registered",\n        "2-active",\n        "3-closed"\n      ]\n    }\n  },\n  "description": "Created user object",\n  "required": true\n}'
+                        schema: '{\n  "$schema": "http://json-schema.org/draft-04/schema#",\n  "properties": {\n    "id": {\n      "type": "integer"\n    },\n    "firstName": {\n      "type": "string"\n    },\n    "username": {\n      "type": "string"\n    },\n    "lastName": {\n      "type": "string"\n    },\n    "email": {\n      "type": "string"\n    },\n    "password": {\n      "type": "string"\n    },\n    "phone": {\n      "type": "string"\n    },\n    "userStatus": {\n      "type": "integer",\n      "description": "User Status",\n      "enum": [\n        "1-registered",\n        "2-active",\n        "3-closed"\n      ]\n    }\n  },\n  "description": "Created user object",\n  "required": true\n}'
                       }
                     }
                   }
