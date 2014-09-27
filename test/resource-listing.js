@@ -3,21 +3,11 @@ var expect    = require('chai').expect;
 var converter = require('../lib/resource-listing');
 
 describe('resourse listing', function () {
-  describe('resources', function () {
-    it('should convert root resources', function () {
-      var output = converter({
-        apis: [{
-          path:        '/user',
-          description: 'Users of the app'
-        }]
-      });
-
-      expect(output).to.deep.equal({
-        resources: [{
-          relativeUri: '/user',
-          description: 'Users of the app'
-        }]
-      });
+  describe('validation', function () {
+    it('should throw when missing apis', function () {
+      expect(function () {
+        converter({})
+      }).to.throw(Error, /valid/);
     });
   });
 
@@ -25,6 +15,7 @@ describe('resourse listing', function () {
     describe('implicit', function () {
       it('should convert implicit authentication', function () {
         var output = converter({
+          apis: [],
           authorizations: {
             oauth2: {
               type: 'oauth2',
@@ -57,6 +48,7 @@ describe('resourse listing', function () {
     describe('authorization code', function () {
       it('should convert authorization code authentication', function () {
         var output = converter({
+          apis: [],
           authorizations: {
             oauth2: {
               type: 'oauth2',
@@ -95,6 +87,7 @@ describe('resourse listing', function () {
     describe('basic auth', function () {
       it('should convert basic authentication', function () {
         var output = converter({
+          apis: [],
           authorizations: {
             basic: {
               type: 'basicAuth'
@@ -115,6 +108,7 @@ describe('resourse listing', function () {
     describe('api key', function () {
       it('should convert the api key type with documentation', function () {
         var output = converter({
+          apis: [],
           authorizations: {
             apiKey: {
               type: 'apiKey',
@@ -140,6 +134,7 @@ describe('resourse listing', function () {
   describe('api version', function () {
     it('should set the api version', function () {
       var output = converter({
+        apis: [],
         apiVersion: '1.1'
       });
 
@@ -152,6 +147,7 @@ describe('resourse listing', function () {
   describe('swagger information', function () {
     it('should convert base swagger information', function () {
       var output = converter({
+        apis: [],
         info: {
           title: 'Example API',
           description: 'This is an example.',
@@ -187,6 +183,13 @@ describe('resourse listing', function () {
           }
         ]
       });
+    });
+
+    it('should not add root documentation when nothing exists', function () {
+      expect(converter({
+        apis: [],
+        info: []
+      })).to.deep.equal({});
     });
   });
 });

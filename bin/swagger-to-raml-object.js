@@ -7,7 +7,7 @@ var args      = process.argv.slice(2);
 
 if (!args.length) {
   console.error();
-  console.error('Usage: swagger-to-raml-object resource.json');
+  console.error('Usage: swagger-to-raml-object api-docs');
   console.error();
   process.exit(1);
 }
