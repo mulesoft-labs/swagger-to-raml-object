@@ -4,27 +4,60 @@
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
-Takes a swagger spec and converts it into a RAML JavaScript object, usually for conversion to RAML with the `raml-object-to-raml` module.
+Takes a swagger spec and converts it into a RAML JavaScript object, usually for conversion to RAML with the [raml-object-to-raml](https://github.com/mulesoft/raml-object-to-raml) module.
 
 ## Installation
 
-```
+```bash
 npm install swagger-to-raml-object --save
 ```
 
 ## Usage
 
+Quickly get started converting swagger to RAML in your command line:
+
+```bash
+# Make sure node and npm are installed before continuing.
+
+npm install swagger-to-raml-object -g
+npm install raml-object-to-raml -g
+
+# Convert a swagger spec into a raml object.
+swagger-to-raml-object http://petstore.swagger.wordnik.com/api/api-docs
+
+# Pipe the result of that into the raml object to raml converter.
+swagger-to-raml-object http://petstore.swagger.wordnik.com/api/api-docs | raml-object-to-raml
+
+# You can then output the result of that to a file.
+swagger-to-raml-object http://petstore.swagger.wordnik.com/api/api-docs | raml-object-to-raml > output.raml
+```
+
 ### CLI
 
 The CLI accepts a single swagger file to load and will recursively compile the spec into a single RAML object representation before printing the JSON to stdout.
 
-```javascript
+```bash
 swagger-to-raml-object resources.json > raml.json
 ```
 
 ### JavaScript
 
+The module exports a single function for converting Swagger specifications. It accepts three arguments, the root resource listing, a file reader function and a callback for when parsing is complete. The callback is called with an error (if something occured) and the resulting RAML object.
 
+```javascript
+var converter = require('swagger-to-raml-object');
+
+converter(rootFile, function (filename, done) {
+  return fs.readFile(filename, 'utf8', done);
+}, function (err, ramlObject) {
+  if (err) {
+    console.error(err);
+  }
+
+  console.log(ramlObject);
+});
+
+```
 
 ## License
 
