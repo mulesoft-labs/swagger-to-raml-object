@@ -4,7 +4,8 @@
   "description": "Takes a swagger spec and converts it into a RAML JavaScript object, usually for conversion to RAML.",
   "main": "swagger-to-raml-object.js",
   "scripts": {
-    "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec"
+    "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec",
+    "build": "browserify -e . -s swagger-to-raml-object -o dist/swagger-to-raml-object.js && uglifyjs dist/swagger-to-raml-object.js -o dist/swagger-to-raml-object.min.js"
   },
   "bin": {
     "swagger-to-raml-object": "./bin/swagger-to-raml-object.js"
@@ -25,9 +26,11 @@
   },
   "homepage": "https://github.com/mulesoft/swagger-to-raml-object",
   "devDependencies": {
+    "browserify": "^6.0.3",
     "chai": "^1.9.1",
     "istanbul": "^0.3.0",
-    "mocha": "^1.21.4"
+    "mocha": "^1.21.4",
+    "uglify-js": "^2.4.15"
   },
   "dependencies": {
     "extend": "^1.3.0",
