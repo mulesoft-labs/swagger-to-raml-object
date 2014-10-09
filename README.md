@@ -55,9 +55,22 @@ converter(rootFile, function (filename, done) {
   }
 
   console.log(ramlObject);
+  // {
+  //   "title": "Example API",
+  //   "resources": [{ ... }],
+  //   ...
+  // }
 });
 
 ```
+
+## Features and Limitations
+
+* Works with Swagger 1.2 (not 2.0 yet)
+* Loads from any resource structure given a file reader function
+* Does not parse XML bodies into schemas yet (only JSON and form)
+* Does not do any RAML documentation optimisations such as `resourceTypes`, `traits` or global `schemas`
+* Currently only does single file output
 
 ## License
 
