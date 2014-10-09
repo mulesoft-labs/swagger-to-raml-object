@@ -392,12 +392,12 @@ function convertFormParameters (params, consumes, declaration, ramlMethod) {
 
   // Alias the object based on the consumes type.
   if (multiPart && urlEncoded) {
-    ramlMethod.body[MULTI_PART_MIME].formParameters  = ramlParams;
-    ramlMethod.body[URL_ENCODED_MIME].formParameters = ramlParams;
+    ramlMethod.body[MULTI_PART_MIME] = { formParameters: ramlParams };
+    ramlMethod.body[URL_ENCODED_MIME] = { formParameters: ramlParams };
   } else if (multiPart) {
-    ramlMethod.body[MULTI_PART_MIME].formParameters = ramlParams;
+    ramlMethod.body[MULTI_PART_MIME] = { formParameters: ramlParams };
   } else {
-    ramlMethod.body[URL_ENCODED_MIME].formParameters = ramlParams;
+    ramlMethod.body[URL_ENCODED_MIME] = { formParameters: ramlParams };
   }
 
   return ramlMethod;
