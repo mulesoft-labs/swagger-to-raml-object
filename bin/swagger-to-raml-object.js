@@ -14,7 +14,9 @@ if (!args.length) {
 
 converter(args[0], function (filename, done) {
   if (/https?:\/\//i.test(filename)) {
-    return request(filename, function (err, res, body) {
+    return request(filename, {
+      rejectUnauthorized: false
+    }, function (err, res, body) {
       return done(err, body);
     });
   }
