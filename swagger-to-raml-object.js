@@ -1,4 +1,5 @@
 var parse                  = require('./lib/parse');
+var resolve                = require('./lib/utils/resolve');
 var isResourceListing      = require('./lib/utils/is-resource-listing');
 var convertApiDeclaration  = require('./lib/api-declaration');
 var convertResourceListing = require('./lib/resource-listing');
@@ -26,7 +27,7 @@ function swaggerToRamlObject (filename, filereader, done) {
     // Parse the initial resource listing to start reading more resources.
     var ramlObject = convertResourceListing(result);
     var resources  = result.apis.map(function (api) {
-      return filename + api.path;
+      return resolve(filename, api.path);
     });
 
     return async(resources, read, wrapContents(function (results) {
