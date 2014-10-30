@@ -22,7 +22,7 @@ describe('api declaration', function () {
   });
 
   describe('apis', function () {
-    it.only('should create under a the resource path', function () {
+    it('should create under the resource path', function () {
       var output = converter({
         basePath: 'http://example.com',
         apiVersion: '1.0.0',
