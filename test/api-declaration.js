@@ -13,9 +13,7 @@ describe('api declaration', function () {
 
       expect(output).to.deep.equal({
         baseUri: 'http://example.com',
-        resources: [{
-          relativeUri: '/'
-        }],
+        resources: [],
         version: '1.2'
       });
     });
