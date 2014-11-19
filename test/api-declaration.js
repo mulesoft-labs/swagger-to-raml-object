@@ -185,6 +185,18 @@ describe('api declaration', function () {
         resources: [
           {
             relativeUri: '/user',
+            methods: [
+              {
+                method: 'POST',
+                displayName: 'createUser',
+                description: 'This can only be done by the logged in user.',
+                body: {
+                  'application/json': {
+                    schema: '{\n  "$schema": "http://json-schema.org/draft-04/schema#",\n  "properties": {\n    "id": {\n      "type": "integer"\n    },\n    "firstName": {\n      "type": "string"\n    },\n    "username": {\n      "type": "string"\n    },\n    "lastName": {\n      "type": "string"\n    },\n    "email": {\n      "type": "string"\n    },\n    "password": {\n      "type": "string"\n    },\n    "phone": {\n      "type": "string"\n    },\n    "userStatus": {\n      "type": "integer",\n      "description": "User Status",\n      "enum": [\n        "1-registered",\n        "2-active",\n        "3-closed"\n      ]\n    }\n  },\n  "description": "Created user object",\n  "required": true\n}'
+                  }
+                }
+              }
+            ],
             resources: [
               {
                 relativeUri: '/{username}',
@@ -259,21 +271,6 @@ describe('api declaration', function () {
                     required: true
                   }
                 }
-              },
-              {
-                relativeUri: '',
-                methods: [
-                  {
-                    method: 'POST',
-                    displayName: 'createUser',
-                    description: 'This can only be done by the logged in user.',
-                    body: {
-                      'application/json': {
-                        schema: '{\n  "$schema": "http://json-schema.org/draft-04/schema#",\n  "properties": {\n    "id": {\n      "type": "integer"\n    },\n    "firstName": {\n      "type": "string"\n    },\n    "username": {\n      "type": "string"\n    },\n    "lastName": {\n      "type": "string"\n    },\n    "email": {\n      "type": "string"\n    },\n    "password": {\n      "type": "string"\n    },\n    "phone": {\n      "type": "string"\n    },\n    "userStatus": {\n      "type": "integer",\n      "description": "User Status",\n      "enum": [\n        "1-registered",\n        "2-active",\n        "3-closed"\n      ]\n    }\n  },\n  "description": "Created user object",\n  "required": true\n}'
-                      }
-                    }
-                  }
-                ]
               }
             ]
           }
