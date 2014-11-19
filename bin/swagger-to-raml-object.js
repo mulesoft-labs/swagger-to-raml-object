@@ -2,6 +2,7 @@
 
 var fs        = require('fs');
 var request   = require('request');
+var normalize = require('path').normalize;
 var converter = require('../');
 var args      = process.argv.slice(2);
 
@@ -21,7 +22,7 @@ converter(args[0], function (filename, done) {
     });
   }
 
-  return fs.readFile(filename, 'utf8', done);
+  return fs.readFile(normalize(filename), 'utf8', done);
 }, function (err, ramlObject) {
   if (err) {
     console.error(err.stack);
