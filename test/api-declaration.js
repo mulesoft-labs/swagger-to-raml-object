@@ -19,6 +19,59 @@ describe('api declaration', function () {
     });
   });
 
+  describe('uri conversion', function () {
+    it('should camel case invalid uri parameters', function () {
+      var output = converter({
+        basePath: 'http://example.com',
+        apiVersion: '1.0.0',
+        swaggerVersion: '1.2',
+        resourcePath: '/user',
+        apis: [{
+          path: '/user/{user-name}',
+          operations: [{
+            method: 'GET',
+            type: 'void',
+            parameters: [{
+              name: 'user-name',
+              description: 'Current user name',
+              required: true,
+              type: 'string',
+              paramType: 'path',
+              allowMultiple: false
+            }]
+          }]
+        }]
+      });
+
+      expect(output).to.deep.equal({
+        baseUri: 'http://example.com',
+        version: '1.0.0',
+        resources: [
+          {
+            relativeUri: '/user',
+            resources: [
+              {
+                methods: [
+                  {
+                    method: 'GET'
+                  }
+                ],
+                relativeUri: '/{userName}',
+                uriParameters: {
+                  userName: {
+                    description: 'Current user name',
+                    required: true,
+                    type: 'string'
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      });
+    });
+  });
+
   describe('apis', function () {
     it('should create under the resource path', function () {
       var output = converter({
