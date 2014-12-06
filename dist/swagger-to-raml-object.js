@@ -236,7 +236,9 @@ function convertOperations (operations, declaration, ramlResource) {
 
     // Initialise the method object. This assumes the same method name has not
     // already been used.
-    var method = { method: operation.method };
+    var method = {
+      method: operation.method
+    };
 
     if (operation.nickname) {
       method.displayName = operation.nickname;
@@ -291,6 +293,16 @@ function convertResponseMessages (operation, declaration, method) {
       responses[response.code].body = {};
 
       produces.forEach(function (mime) {
+        if (response.responseModel && CONVERT_MODEL_TO_SCHEMA[mime]) {
+          responses[response.code].body[mime] = {
+            schema: CONVERT_MODEL_TO_SCHEMA[mime](
+              response.responseModel, declaration
+            )
+          };
+
+          return;
+        }
+
         responses[response.code].body[mime] = null;
       });
     }
@@ -398,13 +410,23 @@ function convertParameters (operation, declaration, ramlMethod, ramlResource) {
 }
 
 /**
- * Map of conversion mime types to functions.
+ * Map of parameter mime types to conversion functions.
  *
  * @type {Object}
  */
 var CONVERT_PARAMS_TO_SCHEMA = {
   'application/xml':  null, // convertParameterToXmlSchema
   'application/json': convertParameterToJsonSchema
+};
+
+/**
+ * Map of model mime types to conversion functions.
+ *
+ * @type {Object}
+ */
+var CONVERT_MODEL_TO_SCHEMA = {
+  'application/xml':  null, // convertParameterToXmlSchema
+  'application/json': convertModelToJsonSchema
 };
 
 /**
@@ -664,6 +686,21 @@ function convertParameterToJsonSchema (param, declaration) {
   return JSON.stringify(schema, null, 2);
 }
 
+/**
+ * Convert a model to JSON.
+ *
+ * @param  {String} name
+ * @param  {Object} declaration
+ * @return {String}
+ */
+function convertModelToJsonSchema (name, declaration) {
+  var schema = extend({
+    $schema: 'http://json-schema.org/draft-04/schema#'
+  }, convertModelToJson(name, declaration));
+
+  return JSON.stringify(schema, null, 2);
+}
+
 },{"./utils/version":7,"./utils/version-equal":6,"camel-case":8,"extend":13}],2:[function(require,module,exports){
 /**
  * Expose the parse module.
@@ -677,7 +714,13 @@ module.exports = parse;
  * @return {Object}
  */
 function parse (content) {
-  return JSON.parse(content);
+  var result = JSON.parse(content);
+
+  if (!result.swaggerVersion) {
+    throw new Error('Swagger version is required');
+  }
+
+  return result;
 }
 
 },{}],3:[function(require,module,exports){
@@ -1003,17 +1046,58 @@ module.exports = resolve;
  * @return {String}
  */
 function resolve () {
-  return Array.prototype.reduce.call(arguments, function (path, part) {
-    if (hasProtocol(part)) {
-      return part;
+  var parts = Array.prototype.reduce.call(arguments, function (path, segment) {
+    var parts = splitSegment(segment);
+
+    if (hasProtocol(segment)) {
+      return parts;
     }
 
-    if (isAbsolute(part)) {
-      return path + part;
-    }
+    return path.concat(parts);
+  }, []);
 
-    return path + '/' + part;
-  });
+  var index = 0;
+
+  while (index < parts.length) {
+    var part = parts[index];
+
+    if (part === '' || part === '.') {
+      parts.splice(index, 1);
+    } else if (part === '..') {
+      parts.splice(index - 1, 2);
+      index--;
+    } else {
+      index++;
+    }
+  }
+
+  return parts.join('/');
+}
+
+/**
+ * Split a path into parts.
+ *
+ * @param  {String} segment
+ * @return {Array}
+ */
+function splitSegment (segment) {
+  if (!hasProtocol(segment)) {
+    return segment.replace(/^\/+/, '').split(/\/+/g);
+  }
+
+  var proto = segment.match(/^\w+:\/\//)[0];
+  var index = segment.substr(proto.length).indexOf('/');
+
+  // No URL path.
+  if (index === -1) {
+    return [segment];
+  }
+
+  var pathIndex = proto.length + index;
+  var parts     = splitSegment(segment.substr(pathIndex));
+  var origin    = segment.substr(0, pathIndex);
+
+  return [origin].concat(parts);
 }
 
 /**
@@ -1023,7 +1107,7 @@ function resolve () {
  * @return {Boolean}
  */
 function hasProtocol (path) {
-  return /^\w+:\//.test(path);
+  return /^\w+:\/\//.test(path);
 }
 
 /**
@@ -1230,6 +1314,7 @@ var convertResourceListing = require('./lib/resource-listing');
  * Expose the swagger to raml object converter module.
  */
 module.exports = swaggerToRamlObject;
+module.exports.files = swaggerFilesToRamlObject;
 
 /**
  * Convert swagger to a raml object by loading the file.
@@ -1254,13 +1339,80 @@ function swaggerToRamlObject (filename, filereader, done) {
 
     return async(resources, read, wrapContents(function (results) {
       // Iterate over the resulting contents and convert into a single object.
-      results.forEach(function (result) {
-        convertApiDeclaration(result, ramlObject);
+      results.forEach(function (contents) {
+        convertApiDeclaration(contents, ramlObject);
       });
 
       return done(null, ramlObject);
     }, done));
   }, done));
+}
+
+/**
+ * Generate RAML from an array of Swagger files.
+ *
+ * @param {Array}    files
+ * @param {Function} filereader
+ * @param {Function} done
+ */
+function swaggerFilesToRamlObject (files, filereader, done) {
+  return async(files, filereader, wrapContents(function (results) {
+    var fileMap = {};
+
+    // Parse all the files and ignore non-parsable files (non-Swagger, etc.)
+    results.forEach(function (contents, index) {
+      var filename = files[index];
+      var result;
+
+      try {
+        result = parse(contents);
+      } catch (e) {
+        return;
+      }
+
+      fileMap[filename] = result;
+    });
+
+    var rootFileName    = findResourceListing(fileMap);
+    var resourceListing = fileMap[rootFileName];
+
+    if (!rootFileName) {
+      throw new Error('No entry file found (single resource listing)');
+    }
+
+    var ramlObject = convertResourceListing(resourceListing);
+
+    resourceListing.apis.forEach(function (api) {
+      var filename = resolve(rootFileName, api.path);
+      var contents = fileMap[filename];
+
+      if (!contents) {
+        throw new Error('File does not exist: ' + filename);
+      }
+
+      convertApiDeclaration(contents, ramlObject);
+    });
+
+    return done(null, ramlObject);
+  }, done));
+}
+
+/**
+ * Find a valid resource listing file out of an object.
+ *
+ * @param  {Object} files
+ * @return {String}
+ */
+function findResourceListing (files) {
+  var resourceListings = Object.keys(files).filter(function (key) {
+    return isResourceListing(files[key]);
+  });
+
+  if (resourceListings.length > 1) {
+    throw new Error('Multiple resource listings found');
+  }
+
+  return resourceListings[0];
 }
 
 /**
@@ -1284,10 +1436,12 @@ function async (items, fn, done) {
       }
 
       if (err) {
+        errored = true;
+
         return done(err);
       }
 
-      count++
+      count++;
       results[index] = result;
 
       if (count === length) {
