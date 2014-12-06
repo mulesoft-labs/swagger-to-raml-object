@@ -62,10 +62,12 @@ function async (items, fn, done) {
       }
 
       if (err) {
+        errored = true;
+
         return done(err);
       }
 
-      count++
+      count++;
       results[index] = result;
 
       if (count === length) {
