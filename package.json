@@ -1,6 +1,6 @@
 {
   "name": "swagger-to-raml-object",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Takes a swagger spec and converts it into a RAML JavaScript object, usually for conversion to RAML.",
   "main": "swagger-to-raml-object.js",
   "scripts": {
