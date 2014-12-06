@@ -8,6 +8,7 @@ var convertResourceListing = require('./lib/resource-listing');
  * Expose the swagger to raml object converter module.
  */
 module.exports = swaggerToRamlObject;
+module.exports.files = swaggerFilesToRamlObject;
 
 /**
  * Convert swagger to a raml object by loading the file.
@@ -32,13 +33,80 @@ function swaggerToRamlObject (filename, filereader, done) {
 
     return async(resources, read, wrapContents(function (results) {
       // Iterate over the resulting contents and convert into a single object.
-      results.forEach(function (result) {
-        convertApiDeclaration(result, ramlObject);
+      results.forEach(function (contents) {
+        convertApiDeclaration(contents, ramlObject);
       });
 
       return done(null, ramlObject);
     }, done));
   }, done));
+}
+
+/**
+ * Generate RAML from an array of Swagger files.
+ *
+ * @param {Array}    files
+ * @param {Function} filereader
+ * @param {Function} done
+ */
+function swaggerFilesToRamlObject (files, filereader, done) {
+  return async(files, filereader, wrapContents(function (results) {
+    var fileMap = {};
+
+    // Parse all the files and ignore non-parsable files (non-Swagger, etc.)
+    results.forEach(function (contents, index) {
+      var filename = files[index];
+      var result;
+
+      try {
+        result = parse(contents);
+      } catch (e) {
+        return;
+      }
+
+      fileMap[filename] = result;
+    });
+
+    var rootFileName    = findResourceListing(fileMap);
+    var resourceListing = fileMap[rootFileName];
+
+    if (!rootFileName) {
+      throw new Error('No entry file found (single resource listing)');
+    }
+
+    var ramlObject = convertResourceListing(resourceListing);
+
+    resourceListing.apis.forEach(function (api) {
+      var filename = resolve(rootFileName, api.path);
+      var contents = fileMap[filename];
+
+      if (!contents) {
+        throw new Error('File does not exist: ' + filename);
+      }
+
+      convertApiDeclaration(contents, ramlObject);
+    });
+
+    return done(null, ramlObject);
+  }, done));
+}
+
+/**
+ * Find a valid resource listing file out of an object.
+ *
+ * @param  {Object} files
+ * @return {String}
+ */
+function findResourceListing (files) {
+  var resourceListings = Object.keys(files).filter(function (key) {
+    return isResourceListing(files[key]);
+  });
+
+  if (resourceListings.length > 1) {
+    throw new Error('Multiple resource listings found');
+  }
+
+  return resourceListings[0];
 }
 
 /**
