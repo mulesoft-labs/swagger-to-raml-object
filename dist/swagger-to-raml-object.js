@@ -1332,19 +1332,18 @@ function swaggerToRamlObject (filename, filereader, done) {
     }
 
     // Parse the initial resource listing to start reading more resources.
+    var resources  = extractResources(result, filename);
     var ramlObject = convertResourceListing(result);
-    var resources  = result.apis.map(function (api) {
-      return resolve(filename, api.path);
-    });
 
-    return async(resources, read, wrapContents(function (results) {
-      // Iterate over the resulting contents and convert into a single object.
+    function success (results) {
       results.forEach(function (contents) {
         convertApiDeclaration(contents, ramlObject);
       });
 
       return done(null, ramlObject);
-    }, done));
+    }
+
+    return async(resources, read, wrapContents(success, done));
   }, done));
 }
 
@@ -1380,21 +1379,41 @@ function swaggerFilesToRamlObject (files, filereader, done) {
       throw new Error('No entry file found (single resource listing)');
     }
 
+    var read       = wrapFileReader(filereader);
+    var resources  = extractResources(resourceListing, rootFileName);
     var ramlObject = convertResourceListing(resourceListing);
 
-    resourceListing.apis.forEach(function (api) {
-      var filename = resolve(rootFileName, api.path);
-      var contents = fileMap[filename];
-
-      if (!contents) {
-        throw new Error('File does not exist: ' + filename);
+    function readfile (filename, done) {
+      if (fileMap.hasOwnProperty(filename)) {
+        return done(null, fileMap[filename]);
       }
 
-      convertApiDeclaration(contents, ramlObject);
-    });
+      return read(filename, done);
+    }
 
-    return done(null, ramlObject);
+    function success (results) {
+      results.forEach(function (contents) {
+        convertApiDeclaration(contents, ramlObject);
+      });
+
+      return done(null, ramlObject);
+    }
+
+    return async(resources, readfile, wrapContents(success, done));
   }, done));
+}
+
+/**
+ * Extract API resources from a resource listing.
+ *
+ * @param  {Object} resourceListing
+ * @param  {String} filename
+ * @return {Array}
+ */
+function extractResources (resourceListing, filename) {
+  return resourceListing.apis.map(function (api) {
+    return resolve(filename, api.path);
+  });
 }
 
 /**
