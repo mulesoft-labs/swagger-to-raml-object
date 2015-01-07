@@ -5,7 +5,8 @@
   "main": "swagger-to-raml-object.js",
   "scripts": {
     "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec",
-    "build": "browserify -e . -s swagger-to-raml-object -o dist/swagger-to-raml-object.js && uglifyjs dist/swagger-to-raml-object.js -o dist/swagger-to-raml-object.min.js"
+    "build": "browserify -e . -s swagger-to-raml-object -o dist/swagger-to-raml-object.js && uglifyjs dist/swagger-to-raml-object.js -o dist/swagger-to-raml-object.min.js",
+    "stage-build": "git add dist"
   },
   "bin": {
     "swagger-to-raml-object": "./bin/swagger-to-raml-object.js"
@@ -16,6 +17,7 @@
   },
   "pre-commit": [
     "build",
+    "stage-build",
     "test"
   ],
   "keywords": [
