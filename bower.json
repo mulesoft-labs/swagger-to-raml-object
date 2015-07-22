@@ -1,7 +1,7 @@
 {
   "name": "swagger-to-raml-object",
   "main": "dist/swagger-to-raml-object.js",
-  "version": "0.0.0",
+  "version": "0.0.6",
   "homepage": "https://github.com/mulesoft/swagger-to-raml-object",
   "authors": "MuleSoft Inc.",
   "description": "Takes a swagger spec and converts it into a RAML JavaScript object, usually for conversion to RAML.",
