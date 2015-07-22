@@ -78,9 +78,14 @@ function swaggerFilesToRamlObject (files, filereader, done) {
     }
 
     var resourceListing = fileMap[rootFileName];
-    var read            = wrapFileReader(filereader);
-    var resources       = extractResources(resourceListing, rootFileName);
-    var ramlObject      = convertResourceListing(resourceListing);
+
+    if (!isResourceListing(resourceListing)) {
+      return done(null, convertApiDeclaration(resourceListing));
+    }
+
+    var read       = wrapFileReader(filereader);
+    var resources  = extractResources(resourceListing, rootFileName);
+    var ramlObject = convertResourceListing(resourceListing);
 
     function readfile (filename, done) {
       if (fileMap.hasOwnProperty(filename)) {
