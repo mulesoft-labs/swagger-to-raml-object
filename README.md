@@ -1,3 +1,5 @@
+**This repository is deprecated! Please use the official [oas-raml-converter](https://github.com/mulesoft/oas-raml-converter) instead.**
+
 # Swagger To RAML Object
 
 [![NPM version][npm-image]][npm-url]
